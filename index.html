@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CareerFit AI — Career Readiness Studio</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+:root{--navy:#102238;--navy2:#18364b;--teal:#0f9f91;--teal-dark:#087f76;--mint:#e6f7f4;--bg:#f4f7fa;--card:#fff;--ink:#172b3a;--muted:#687b89;--line:#dfe8ed;--amber:#b7791f;--red:#b93838;--shadow:0 8px 28px rgba(16,34,56,.06)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,textarea{font:inherit}button{cursor:pointer}.topbar{background:var(--navy);color:white}.nav{max-width:1180px;margin:auto;padding:17px 24px;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:19px;letter-spacing:-.4px}.logo{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:var(--teal);font-weight:900}.navright{font-size:12px;color:#c8d7df;display:flex;gap:8px;align-items:center}.live-dot{width:7px;height:7px;border-radius:50%;background:#58d8b8;display:inline-block}.hero{background:linear-gradient(120deg,var(--navy),var(--navy2));color:white;padding:43px 24px 52px}.hero-inner{max-width:1180px;margin:auto}.eyebrow{color:#7de0d1;font-size:11px;font-weight:800;letter-spacing:1.7px;text-transform:uppercase}.hero h1{font-size:clamp(29px,4vw,44px);line-height:1.13;letter-spacing:-1.5px;max-width:700px;margin:13px 0}.hero h1 span{color:#6ee0cf}.hero p{max-width:660px;color:#d0dce5;margin:0;font-size:16px}.hero-chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}.chip{font-size:12px;border:1px solid #466173;color:#e4eef3;padding:6px 11px;border-radius:99px}.layout{max-width:1180px;margin:-22px auto 0;padding:0 24px 40px;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.8fr);gap:20px;position:relative}.panel{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:23px;box-shadow:var(--shadow);min-width:0}.panel-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:18px}.panel h2{font-size:17px;margin:0;letter-spacing:-.3px}.sub{font-size:12px;color:var(--muted);margin-top:4px}.step{font-size:11px;font-weight:800;color:var(--teal-dark);background:var(--mint);padding:5px 9px;border-radius:7px;white-space:nowrap}.field-label{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:750;margin:15px 0 8px}.field-label small{font-weight:500;color:var(--muted)}textarea,input[type=text]{width:100%;border:1px solid var(--line);border-radius:11px;padding:13px 14px;color:var(--ink);background:#fbfcfd;outline:none;transition:.15s}textarea{min-height:175px;resize:vertical}textarea:focus,input:focus{border-color:var(--teal);box-shadow:0 0 0 3px #0f9f9117;background:white}.upload{border:1.5px dashed #a8c8c8;border-radius:11px;background:#f7fcfb;padding:13px;display:flex;align-items:center;gap:12px}.upload-icon{width:38px;height:38px;border-radius:10px;background:var(--mint);display:grid;place-items:center;font-size:19px}.upload-copy{flex:1;min-width:0}.upload-copy strong{display:block;font-size:13px}.upload-copy span{font-size:11px;color:var(--muted)}.file-btn{border:1px solid #c7ddda;background:white;color:var(--teal-dark);font-size:12px;font-weight:750;padding:8px 11px;border-radius:8px;white-space:nowrap}.file-name{font-size:12px;color:var(--teal-dark);margin-top:7px;overflow-wrap:anywhere}.actions{display:flex;gap:10px;margin-top:18px}.primary{background:var(--teal);color:white;border:0;border-radius:10px;padding:13px 17px;font-weight:800;flex:1;box-shadow:0 5px 13px #0f9f912b}.primary:hover{background:var(--teal-dark)}.primary:disabled{opacity:.55;cursor:wait}.secondary{background:white;border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--ink);font-weight:700}.privacy-note{font-size:11px;color:var(--muted);margin-top:12px}.side-stack{display:flex;flex-direction:column;gap:15px}.mini-stat{display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid var(--line)}.mini-stat:last-child{border:0;padding-bottom:0}.stat-icon{width:38px;height:38px;border-radius:11px;background:#edf3f8;display:grid;place-items:center;font-size:17px}.mini-stat strong{display:block;font-size:14px}.mini-stat span{font-size:12px;color:var(--muted)}.history-empty{font-size:12px;color:var(--muted);padding:12px 0}.history-item{border-top:1px solid var(--line);padding:12px 0;display:flex;gap:10px;align-items:center}.history-item:first-child{border-top:0}.history-text{flex:1;min-width:0}.history-text strong{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.history-text span{font-size:11px;color:var(--muted)}.score-pill{font-weight:850;color:var(--teal-dark);background:var(--mint);border-radius:8px;padding:5px 8px;font-size:12px}.history-actions{display:flex;gap:7px;align-items:center}.tiny-btn{border:0;background:none;color:var(--teal-dark);font-size:11px;font-weight:800;padding:4px}.results-wrap{max-width:1180px;margin:0 auto;padding:0 24px 42px}.results-title{display:flex;align-items:end;justify-content:space-between;gap:15px;margin:6px 0 15px}.results-title h2{margin:0;font-size:21px;letter-spacing:-.5px}.results-title p{margin:3px 0 0;color:var(--muted);font-size:12px}.results-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.result-card{background:white;border:1px solid var(--line);border-radius:15px;padding:20px;box-shadow:var(--shadow);min-width:0}.result-card h3{margin:0 0 13px;font-size:14px;display:flex;gap:8px;align-items:center}.score-card{grid-column:span 2;display:grid;grid-template-columns:150px 1fr;align-items:center;gap:20px}.score-ring{width:132px;height:132px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--teal) var(--deg,0deg),#e6eef1 0deg);position:relative}.score-ring:before{content:"";position:absolute;inset:9px;border-radius:50%;background:white}.score-inner{position:relative;text-align:center}.score-inner strong{font-size:38px;line-height:1;display:block;letter-spacing:-1px}.score-inner span{font-size:11px;color:var(--muted)}.score-copy h3{font-size:18px;margin:0 0 6px}.score-copy p{margin:0;color:var(--muted);font-size:13px}.score-meter{height:6px;background:#e8eff2;border-radius:10px;margin-top:14px;overflow:hidden}.score-meter span{display:block;height:100%;background:var(--teal);border-radius:10px}.list{margin:0;padding:0;list-style:none}.list li{padding:9px 0 9px 23px;position:relative;border-bottom:1px solid #edf1f4;font-size:13px;overflow-wrap:anywhere}.list li:last-child{border-bottom:0}.list li:before{content:"✓";position:absolute;left:0;top:10px;color:var(--teal);font-weight:900}.list.warn li:before{content:"↗";color:var(--amber)}.keywords{display:flex;flex-wrap:wrap;gap:7px}.keyword{font-size:12px;background:#fff7e8;color:#8a5a13;border:1px solid #f1dfb9;padding:6px 9px;border-radius:7px}.roadmap-item{display:flex;gap:11px;padding:11px 0;border-bottom:1px solid #edf1f4;font-size:13px}.roadmap-item:last-child{border:0}.roadmap-num{width:25px;height:25px;border-radius:8px;flex-shrink:0;background:var(--mint);color:var(--teal-dark);font-size:12px;font-weight:850;display:grid;place-items:center}.question{padding:10px 0;border-bottom:1px solid #edf1f4;font-size:13px}.question:last-child{border:0}.question summary{cursor:pointer;font-weight:650}.question p{color:var(--muted);font-size:12px}.empty-results{padding:28px;text-align:center;border:1px dashed #cbd9df;border-radius:14px;color:var(--muted);background:#fbfcfd}.status{font-size:12px;color:var(--muted);margin-top:10px;min-height:18px}.error{background:#fff1f1;color:#8c2828;border:1px solid #f0c9c9;border-radius:10px;padding:12px;font-size:13px;margin-top:12px}.footer{border-top:1px solid var(--line);padding:20px 24px;text-align:center;color:var(--muted);font-size:11px}.hidden{display:none!important}.loading-dot{display:inline-block;animation:pulse 1s infinite}@keyframes pulse{50%{opacity:.35}}@media(max-width:850px){.layout{grid-template-columns:1fr}.side-stack{display:grid;grid-template-columns:1fr 1fr}.results-grid{grid-template-columns:1fr}.score-card{grid-column:auto}}@media(max-width:560px){.nav{padding:14px 17px}.hero{padding:32px 18px 42px}.layout,.results-wrap{padding-left:14px;padding-right:14px}.panel{padding:17px}.side-stack{display:flex}.score-card{grid-template-columns:1fr;text-align:center;justify-items:center}.score-copy{text-align:left}.actions{flex-direction:column}.results-title{align-items:start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="nav"><div class="brand"><div class="logo">CF</div><span>CareerFit <span style="color:#72ddcf">AI</span></span></div><div class="navright"><span class="live-dot"></span> CAREER READINESS STUDIO <span style="opacity:.55">·</span> GEMINI</div></div></div>
+<header class="hero"><div class="hero-inner"><div class="eyebrow">Your next career move, made clearer</div><h1>Turn your resume into a <span>career action plan.</span></h1><p>Go beyond keyword matching. Discover your role fit, identify skill gaps, build a practical learning roadmap, and prepare for interviews with evidence-based AI guidance.</p><div class="hero-chips"><span class="chip">✦ Role-fit insights</span><span class="chip">↗ Skill-gap roadmap</span><span class="chip">◎ Interview practice</span><span class="chip">PDF supported</span></div></div></header>
+<main>
+<section class="layout">
+<div class="panel">
+<div class="panel-head"><div><h2>Start your career analysis</h2><div class="sub">Add your resume and the role you want to target.</div></div><span class="step">STEP 01</span></div>
+<div class="field-label"><label for="resume">Resume content</label><small id="resumeCount">0 characters</small></div>
+<textarea id="resume" placeholder="Paste your resume here — education, skills, projects, internships, certifications and achievements..." aria-label="Resume content"></textarea>
+<div class="upload" style="margin-top:10px"><div class="upload-icon">↑</div><div class="upload-copy"><strong>Upload a resume PDF</strong><span>Text-based PDF, up to 8 MB. Or paste your resume above.</span><div id="fileName" class="file-name"></div></div><label class="file-btn" for="pdfFile">Choose PDF</label><input class="hidden" id="pdfFile" type="file" accept="application/pdf"></div>
+<div class="field-label"><label for="jobDesc">Target job description</label><small>Be specific</small></div>
+<textarea id="jobDesc" style="min-height:145px" placeholder="Paste the job description, including role title, responsibilities, required skills and qualifications..." aria-label="Target job description"></textarea>
+<div class="actions"><button class="primary" id="analyzeBtn" type="button">✦ Analyze my career fit</button><button class="secondary" id="clearBtn" type="button">Clear</button></div>
+<div id="status" class="status" role="status"></div><div id="error" class="error hidden" role="alert"></div>
+<div class="privacy-note">Your resume is sent to Gemini for analysis. History is stored in this browser only. AI scores are estimates, not actual employer ATS results.</div>
+</div>
+<aside class="side-stack">
+<div class="panel"><div class="panel-head"><div><h2>What you'll get</h2><div class="sub">A practical plan, not just a score.</div></div></div>
+<div class="mini-stat"><div class="stat-icon">◎</div><div><strong>Career fit score</strong><span>Estimate based on role evidence</span></div></div>
+<div class="mini-stat"><div class="stat-icon">⌁</div><div><strong>Strengths & skill gaps</strong><span>What you show and what to build</span></div></div>
+<div class="mini-stat"><div class="stat-icon">↗</div><div><strong>Learning roadmap</strong><span>Prioritized actions and mini-projects</span></div></div>
+<div class="mini-stat"><div class="stat-icon">✳</div><div><strong>Interview practice</strong><span>Questions tailored to the target role</span></div></div>
+</div>
+<div class="panel"><div class="panel-head"><div><h2>Recent analyses</h2><div class="sub">Saved in this browser</div></div><button class="tiny-btn" id="clearHistory">Clear history</button></div><div id="history"><div class="history-empty">Your saved analyses will appear here after your first run.</div></div></div>
+</aside>
+</section>
+<section class="results-wrap" id="resultsSection"><div class="results-title"><div><h2>Your career insights</h2><p>Run an analysis to generate your personalized report.</p></div><button id="downloadBtn" class="secondary hidden">Download report (.txt)</button></div><div id="results"><div class="empty-results">Your results will appear here after analysis.</div></div></section>
+</main>
+<footer class="footer">CareerFit AI · AI-powered career readiness for students and early-career professionals · Built as an ApnoAI AI/ML internship project</footer>
+<script>
+/* Gemini API requests are handled by /api/analyze.js. Keep API keys server-side. */
+const SYSTEM_PROMPT = `You are CareerFit AI, a career intelligence advisor for fresh graduates, final-year students, and entry-level technology candidates. Compare the supplied resume with the job description. Be specific, fair, practical, evidence-based, and encouraging without exaggerating. Never invent skills, achievements, metrics, qualifications, or experience. A missing keyword is not proof that the candidate lacks the skill. ATS-style score is only an estimate, not a real employer ATS score or hiring guarantee. Return ONLY valid JSON with these exact fields and types: {"ats_score": integer 0-100, "summary": string, "strengths": string[], "missing_keywords": string[], "improvements": string[], "skill_gaps": string[], "learning_roadmap": string[], "interview_questions": string[]}. Give 3-5 strengths, 3-5 missing keywords, exactly 3 resume improvements, 3-5 skill gaps if supported, 3 prioritized learning roadmap actions with a practical exercise or mini-project, and 5 realistic interview questions. Tailor all advice to the role and evidence in the resume. Keep items concise and actionable. If information is insufficient, state the limitation instead of guessing.`;
+const $ = id => document.getElementById(id);
+let latestAnalysis = null;
+let latestTitle = "CareerFit AI report";
+if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+$("resume").addEventListener("input", () => $("resumeCount").textContent = $("resume").value.length.toLocaleString() + " characters");
+$("pdfFile").addEventListener("change", async event => {
+ const file = event.target.files[0]; if(!file) return;
+ $("fileName").textContent = ""; showError("");
+ if(file.type !== "application/pdf" || file.size > 8*1024*1024){showError("Choose a PDF file smaller than 8 MB.");event.target.value="";return;}
+ if(!window.pdfjsLib){showError("PDF reader could not load. Check your internet connection, then try again.");return;}
+ $("status").textContent = "Extracting text from PDF…";
+ try{
+  const pdf = await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise; let text = "";
+  for(let i=1;i<=pdf.numPages;i++){const page=await pdf.getPage(i);const content=await page.getTextContent();text += content.items.map(item=>item.str).join(" ") + "\n";}
+  if(text.trim().length<40){showError("This PDF appears to contain scanned images rather than selectable text. Paste the resume text instead.");$("status").textContent="";return;}
+  $("resume").value=text.trim();$("resumeCount").textContent=$("resume").value.length.toLocaleString()+" characters";$("fileName").textContent="✓ Loaded: "+file.name;$("status").textContent="Resume text extracted. You can review it before analysis.";
+ }catch(e){showError("Could not read this PDF. Try another PDF or paste the text.");$("status").textContent="";}
+});
+function showError(message){$("error").textContent=message;$("error").classList.toggle("hidden",!message);}
+function safe(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function arr(v){return Array.isArray(v)?v.filter(x=>x!==null&&x!==undefined&&String(x).trim()!==""):[];}
+function listHTML(items, cls=""){const a=arr(items);return a.length?`<ul class="list ${cls}">${a.map(x=>`<li>${safe(x)}</li>`).join("")}</ul>`:`<p class="sub">No specific items identified from the information provided.</p>`;}
+function card(title, icon, content){return `<article class="result-card"><h3><span>${icon}</span>${title}</h3>${content}</article>`;}
+function renderResults(a){
+ const score=Math.max(0,Math.min(100,Number(a.ats_score)||0));const deg=score*3.6;
+ let summary=String(a.summary||"No summary provided.");
+ let keywords=arr(a.missing_keywords);
+ $("results").innerHTML=`
+ <article class="result-card score-card"><div class="score-ring" style="--deg:${deg}deg"><div class="score-inner"><strong>${score}</strong><span>out of 100</span></div></div><div class="score-copy"><div class="eyebrow" style="color:var(--teal-dark)">YOUR ROLE-FIT SNAPSHOT</div><h3 style="margin-top:5px">${score>=80?"Strong alignment":score>=60?"Promising foundation":score>=40?"Some gaps to close":"Build the core requirements"}</h3><p>${safe(summary)}</p><div class="score-meter"><span style="width:${score}%"></span></div><p style="font-size:10px;margin-top:8px">AI-generated estimate. Not an employer ATS score or hiring guarantee.</p></div></article>
+ ${card("Evidence-based strengths","✓",listHTML(a.strengths))}
+ ${card("Keywords to review","⌕",keywords.length?`<div class="keywords">${keywords.map(k=>`<span class="keyword">${safe(k)}</span>`).join("")}</div><p class="sub" style="margin-top:12px">Only add a skill to your resume if you can honestly support it.</p>`:`<p class="sub">No major keyword gaps identified from the supplied information.</p>`)}
+ ${card("Resume improvement actions","↗",listHTML(a.improvements,"warn"))}
+ ${card("Skill-gap analysis","⌁",listHTML(a.skill_gaps,"warn"))}
+ <article class="result-card"><h3>🧭 Your personalized learning roadmap</h3>${arr(a.learning_roadmap).length?arr(a.learning_roadmap).map((x,i)=>`<div class="roadmap-item"><span class="roadmap-num">${i+1}</span><span>${safe(x)}</span></div>`).join(""):'<p class="sub">No roadmap items returned.</p>'}</article>
+ <article class="result-card"><h3>✳ Interview practice</h3>${arr(a.interview_questions).length?arr(a.interview_questions).map((q,i)=>`<details class="question"><summary>${i+1}. ${safe(q)}</summary><p>Practice with a real example from your studies, projects, internship, or experience. Explain your approach and what you learned.</p></details>`).join(""):'<p class="sub">No questions returned.</p>'}</article>`;
+ $("downloadBtn").classList.remove("hidden");$("resultsSection").scrollIntoView({behavior:"smooth",block:"start"});
+}
+async function analyzeResume(){
+ const resume=$("resume").value.trim(),job=$("jobDesc").value.trim();showError("");
+ if(resume.length<50||job.length<50){showError("Please provide a resume and a job description with at least 50 characters each.");return;}
+ const btn=$("analyzeBtn");btn.disabled=true;btn.textContent="Analyzing…";
+ $("status").textContent="Sending your resume securely to CareerFit AI…";
+ try{
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),35000);
+  let response,data;
+  try{
+   response=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({resume,job}),signal:controller.signal});
+   data=await response.json().catch(()=>({error:"The server returned an invalid response."}));
+  } finally {clearTimeout(timer);}
+  if(!response.ok) throw new Error(data.error||`Analysis failed (${response.status}). Please try again.`);
+  const a=data.analysis;
+  if(!a||!Number.isFinite(Number(a.ats_score))||!Array.isArray(a.strengths)||!Array.isArray(a.improvements))throw new Error("The AI response was missing required fields. Please try again.");
+  latestAnalysis=a;latestTitle=(job.match(/(?:job title|position|role)\s*[:\-]\s*([^\n,]+)/i)||[])[1]||job.split(/\n/)[0].slice(0,70)||"Career analysis";
+  renderResults(a);saveHistory({title:latestTitle,score:Math.max(0,Math.min(100,Number(a.ats_score)||0)),date:new Date().toISOString(),analysis:a});
+  $("status").textContent="Analysis complete. Review the recommendations and choose your next action.";
+ }catch(e){
+  const msg=e.name==="AbortError"?"The analysis took too long. Please wait a minute and try once more.":(e.message||"Could not complete analysis. Please try again.");
+  showError(msg);$("status").textContent="Analysis could not be completed.";
+ }finally{btn.disabled=false;btn.textContent="✦ Analyze my career fit";}
+}
+function getHistory(){try{return JSON.parse(localStorage.getItem("careerfit_history")||"[]")}catch(e){return []}}
+function saveHistory(item){let h=getHistory();h.unshift(item);h=h.slice(0,8);try{localStorage.setItem("careerfit_history",JSON.stringify(h))}catch(e){}renderHistory();}
+function renderHistory(){
+ const h=getHistory();$("history").innerHTML=h.length?h.map((item,i)=>`<div class="history-item"><div class="history-text"><strong title="${safe(item.title)}">${safe(item.title||"Career analysis")}</strong><span>${new Date(item.date).toLocaleDateString()} · ${new Date(item.date).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</span></div><div class="history-actions"><span class="score-pill">${Number(item.score)||0}/100</span><button class="tiny-btn" data-history="${i}">View</button></div></div>`).join(""):'<div class="history-empty">Your saved analyses will appear here after your first run.</div>';
+ $("history").querySelectorAll("[data-history]").forEach(btn=>btn.addEventListener("click",()=>{const item=getHistory()[Number(btn.dataset.history)];if(item&&item.analysis){latestAnalysis=item.analysis;latestTitle=item.title||"Career analysis";renderResults(item.analysis);$("status").textContent="Loaded a saved analysis.";}}));
+}
+$("analyzeBtn").addEventListener("click",analyzeResume);
+$("clearBtn").addEventListener("click",()=>{$("resume").value="";$("jobDesc").value="";$("pdfFile").value="";$("fileName").textContent="";$("resumeCount").textContent="0 characters";$("status").textContent="Inputs cleared.";showError("");});
+$("clearHistory").addEventListener("click",()=>{if(confirm("Clear all saved analyses from this browser?")){localStorage.removeItem("careerfit_history");renderHistory();}});
+$("downloadBtn").addEventListener("click",()=>{
+ if(!latestAnalysis)return;const a=latestAnalysis;const lines=["CAREERFIT AI — CAREER ANALYSIS REPORT","Role: "+latestTitle,"Match score: "+a.ats_score+"/100","","SUMMARY",a.summary||"", "", "STRENGTHS",...arr(a.strengths).map(x=>"- "+x),"","MISSING KEYWORDS",...arr(a.missing_keywords).map(x=>"- "+x),"","RESUME IMPROVEMENTS",...arr(a.improvements).map(x=>"- "+x),"","SKILL GAPS",...arr(a.skill_gaps).map(x=>"- "+x),"","LEARNING ROADMAP",...arr(a.learning_roadmap).map((x,i)=>(i+1)+". "+x),"","INTERVIEW QUESTIONS",...arr(a.interview_questions).map((x,i)=>(i+1)+". "+x),"","AI-generated guidance only; not a hiring guarantee."];
+ const blob=new Blob([lines.join("\n")],{type:"text/plain;charset=utf-8"});const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="CareerFit-AI-Report.txt";link.click();URL.revokeObjectURL(url);
+});
+renderHistory();
+</script>
+</body>
+</html>
