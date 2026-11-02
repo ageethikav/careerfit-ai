@@ -86,7 +86,7 @@ async function analyzeResume(){
  $("status").textContent="Sending your resume securely to CareerFit AI…";
  try{
   const controller=new AbortController();
-  const timer=setTimeout(()=>controller.abort(),35000);
+  const timer=setTimeout(()=>controller.abort(),70000);
   let response,data;
   try{
    response=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({resume,job}),signal:controller.signal});
