@@ -1,11 +1,11 @@
 
 const SYSTEM_PROMPT = `You are CareerFit AI, a career intelligence advisor for fresh graduates, final-year students, and entry-level technology candidates.
 
-Compare the supplied resume with the job description. Be specific, fair, practical, evidence-based, and encouraging without exaggerating.
+Compare the supplied resume with the job description. Be specific, fair, practical, evidence-based, and encouraging without exaggerating. Never invent skills, achievements, metrics, qualifications, or experience.
 
-Never invent skills, achievements, metrics, qualifications, or experience. A missing keyword is not proof that the candidate lacks the skill. ATS-style score is only an estimate, not a real employer ATS score or hiring guarantee.
+A missing keyword is not proof that the candidate lacks the skill. ATS-style score is only an estimate, not a real employer ATS score or hiring guarantee.
 
-Return ONLY valid JSON with these exact fields and types:
+Return ONLY valid JSON with these exact fields:
 {
   "ats_score": integer 0-100,
   "summary": string,
@@ -17,17 +17,9 @@ Return ONLY valid JSON with these exact fields and types:
   "interview_questions": string[]
 }
 
-Give:
-- 3-5 strengths
-- 3-5 missing keywords
-- Exactly 3 resume improvements
-- 3-5 skill gaps if supported by evidence
-- 3 prioritized learning roadmap actions with practical exercises or mini-projects
-- 5 realistic interview questions
+Give 3-5 strengths, 3-5 missing keywords, exactly 3 resume improvements, 3-5 skill gaps if supported, 3 prioritized learning actions with practical exercises, and 5 realistic interview questions. Tailor everything to the role and resume. If information is insufficient, state the limitation instead of guessing.`;
 
-Tailor all advice to the role and resume. Keep items concise and actionable. If information is insufficient, state the limitation instead of guessing.`;
-
-const timeoutFetch = async (url, options, timeoutMs) => {
+async function timeoutFetch(url, options, timeoutMs) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -39,7 +31,7 @@ const timeoutFetch = async (url, options, timeoutMs) => {
   } finally {
     clearTimeout(timer);
   }
-};
+}
 
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
@@ -66,7 +58,7 @@ module.exports = async function handler(req, res) {
     job.trim().length < 50
   ) {
     return res.status(400).json({
-      error: "Please provide a resume and job description with at least 50 characters each."
+      error: "Please provide a resume and job description with at least 50 characters."
     });
   }
 
@@ -77,7 +69,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    // Step 1: Discover available Gemini Flash models
+    // Get models supported by this API key
     const modelResponse = await timeoutFetch(
       `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}&pageSize=100`,
       { method: "GET" },
@@ -88,13 +80,13 @@ module.exports = async function handler(req, res) {
       const errorData = await modelResponse.json().catch(() => ({}));
 
       return res.status(503).json({
-        error: errorData.error?.message ||
-          "Unable to retrieve Gemini models. Please try again."
+        error: errorData.error?.message || "Gemini model lookup failed."
       });
     }
 
     const modelData = await modelResponse.json();
 
+    // Exclude the retired model that caused your error
     const available = (modelData.models || [])
       .filter(model =>
         (model.supportedGenerationMethods || [])
@@ -105,14 +97,16 @@ module.exports = async function handler(req, res) {
       )
       .filter(model =>
         /flash/i.test(model) &&
-        !/audio|image|embedding|tts|live/i.test(model)
+        !/audio|image|embedding|tts|live/i.test(model) &&
+        !/2\.5-flash-lite/i.test(model)
       )
       .sort((a, b) => {
         const rank = model => {
-          if (/2\.5-flash/i.test(model)) return 1;
-          if (/2\.0-flash/i.test(model)) return 2;
-          if (/latest/i.test(model)) return 4;
-          return 3;
+          if (/^gemini-3\.5-flash-lite$/i.test(model)) return 1;
+          if (/3\.5-flash/i.test(model)) return 2;
+          if (/3\..*-flash/i.test(model)) return 3;
+          if (/latest/i.test(model)) return 5;
+          return 4;
         };
 
         return rank(a) - rank(b);
@@ -120,12 +114,11 @@ module.exports = async function handler(req, res) {
 
     if (!available.length) {
       return res.status(503).json({
-        error: "No compatible Gemini Flash model is available for this API key."
+        error: "No supported Gemini Flash model was found. Check Google AI Studio model access."
       });
     }
 
-    // Step 2: Prepare the analysis request
-    const body = {
+    const requestBody = {
       systemInstruction: {
         parts: [{ text: SYSTEM_PROMPT }]
       },
@@ -148,7 +141,7 @@ module.exports = async function handler(req, res) {
 
     let lastMessage = "Gemini did not return a response.";
 
-    // Step 3: Try up to two available models
+    // Try the preferred model first, then one available fallback
     for (const model of available.slice(0, 2)) {
       try {
         const response = await timeoutFetch(
@@ -158,68 +151,70 @@ module.exports = async function handler(req, res) {
             headers: {
               "Content-Type": "application/json"
             },
-            body: JSON.stringify(body)
+            body: JSON.stringify(requestBody)
           },
           10000
         );
 
         const data = await response.json().catch(() => ({}));
 
-        if (response.ok) {
-          const raw = (data.candidates?.[0]?.content?.parts || [])
-            .map(part => part.text || "")
-            .join("")
-            .replace(/^```(?:json)?\s*/i, "")
-            .replace(/\s*```$/, "")
-            .trim();
+        if (!response.ok) {
+          lastMessage =
+            data.error?.message || `Gemini returned ${response.status}.`;
 
-          let analysis;
-
-          try {
-            analysis = JSON.parse(raw);
-          } catch {
-            lastMessage = "Gemini returned invalid JSON. Please retry.";
-            continue;
+          if ([400, 401, 403].includes(response.status)) {
+            break;
           }
 
-          const requiredArrays = [
-            "strengths",
-            "missing_keywords",
-            "improvements",
-            "skill_gaps",
-            "learning_roadmap",
-            "interview_questions"
-          ];
-
-          const valid =
-            Number.isInteger(Number(analysis.ats_score)) &&
-            Number(analysis.ats_score) >= 0 &&
-            Number(analysis.ats_score) <= 100 &&
-            typeof analysis.summary === "string" &&
-            requiredArrays.every(field =>
-              Array.isArray(analysis[field])
-            );
-
-          if (!valid) {
-            lastMessage = "Gemini returned an incomplete report. Please retry.";
-            continue;
-          }
-
-          return res.status(200).json({ analysis });
+          continue;
         }
 
-        lastMessage =
-          data.error?.message || `Gemini returned error ${response.status}.`;
+        const raw = (data.candidates?.[0]?.content?.parts || [])
+          .map(part => part.text || "")
+          .join("")
+          .replace(/^```(?:json)?\s*/i, "")
+          .replace(/\s*```$/, "")
+          .trim();
 
-        if ([400, 401, 403].includes(response.status)) {
-          break;
+        let analysis;
+
+        try {
+          analysis = JSON.parse(raw);
+        } catch {
+          lastMessage = "Gemini returned invalid JSON. Please retry.";
+          continue;
         }
+
+        const requiredArrays = [
+          "strengths",
+          "missing_keywords",
+          "improvements",
+          "skill_gaps",
+          "learning_roadmap",
+          "interview_questions"
+        ];
+
+        const valid =
+          Number.isInteger(Number(analysis.ats_score)) &&
+          Number(analysis.ats_score) >= 0 &&
+          Number(analysis.ats_score) <= 100 &&
+          typeof analysis.summary === "string" &&
+          requiredArrays.every(field =>
+            Array.isArray(analysis[field])
+          );
+
+        if (!valid) {
+          lastMessage = "Gemini returned an incomplete report.";
+          continue;
+        }
+
+        return res.status(200).json({ analysis });
 
       } catch (error) {
         lastMessage =
           error.name === "AbortError"
-            ? `Model ${model} took too long to respond.`
-            : error.message || "Network error while contacting Gemini.";
+            ? `Model ${model} timed out.`
+            : error.message || "Network error contacting Gemini.";
       }
     }
 
@@ -228,16 +223,14 @@ module.exports = async function handler(req, res) {
         .test(lastMessage);
 
     return res.status(overloaded ? 503 : 502).json({
-      error: overloaded
-        ? "Gemini is temporarily busy or its request quota is exhausted. Please try again shortly."
-        : `CareerFit AI could not complete the analysis: ${lastMessage}`
+      error: `CareerFit AI could not complete the analysis: ${lastMessage} Please try again shortly.`
     });
 
   } catch (error) {
     return res.status(502).json({
       error:
         error.name === "AbortError"
-          ? "Gemini model lookup timed out. Please try again."
+          ? "Gemini model lookup timed out."
           : error.message || "Unexpected server error."
     });
   }
