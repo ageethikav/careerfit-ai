@@ -1,9 +1,9 @@
 
 const SYSTEM_PROMPT = `You are CareerFit AI, a career intelligence advisor for fresh graduates, final-year students, and entry-level technology candidates.
 
-Compare the supplied resume with the job description. Be specific, fair, practical, evidence-based, and encouraging without exaggerating. Never invent skills, achievements, metrics, qualifications, or experience.
+Compare the supplied resume with the job description. Be specific, fair, practical, evidence-based, and encouraging without exaggerating.
 
-A missing keyword is not proof that the candidate lacks the skill. ATS-style score is only an estimate, not a real employer ATS score or hiring guarantee.
+Never invent skills, achievements, metrics, qualifications, or experience. A missing keyword is not proof that the candidate lacks the skill. ATS-style score is only an estimate, not a real employer ATS score or hiring guarantee.
 
 Return ONLY valid JSON with these exact fields:
 {
@@ -69,11 +69,11 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    // Get models supported by this API key
+    // Discover models supported by this API key
     const modelResponse = await timeoutFetch(
       `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}&pageSize=100`,
       { method: "GET" },
-      5000
+      4000
     );
 
     if (!modelResponse.ok) {
@@ -86,7 +86,6 @@ module.exports = async function handler(req, res) {
 
     const modelData = await modelResponse.json();
 
-    // Exclude the retired model that caused your error
     const available = (modelData.models || [])
       .filter(model =>
         (model.supportedGenerationMethods || [])
@@ -114,9 +113,12 @@ module.exports = async function handler(req, res) {
 
     if (!available.length) {
       return res.status(503).json({
-        error: "No supported Gemini Flash model was found. Check Google AI Studio model access."
+        error: "No supported Gemini Flash model was found for this API key."
       });
     }
+
+    // Use the highest-priority available model
+    const model = available[0];
 
     const requestBody = {
       systemInstruction: {
@@ -135,102 +137,85 @@ module.exports = async function handler(req, res) {
       generationConfig: {
         temperature: 0.2,
         responseMimeType: "application/json",
-        maxOutputTokens: 2200
+        maxOutputTokens: 1800
       }
     };
 
-    let lastMessage = "Gemini did not return a response.";
+    // Allow up to 22 seconds for generation
+    const response = await timeoutFetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(requestBody)
+      },
+      22000
+    );
 
-    // Try the preferred model first, then one available fallback
-    for (const model of available.slice(0, 2)) {
-      try {
-        const response = await timeoutFetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify(requestBody)
-          },
-          10000
-        );
+    const data = await response.json().catch(() => ({}));
 
-        const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const message =
+        data.error?.message || `Gemini returned ${response.status}.`;
 
-        if (!response.ok) {
-          lastMessage =
-            data.error?.message || `Gemini returned ${response.status}.`;
+      const status =
+        response.status === 429 || response.status === 503 ? 503 : 502;
 
-          if ([400, 401, 403].includes(response.status)) {
-            break;
-          }
-
-          continue;
-        }
-
-        const raw = (data.candidates?.[0]?.content?.parts || [])
-          .map(part => part.text || "")
-          .join("")
-          .replace(/^```(?:json)?\s*/i, "")
-          .replace(/\s*```$/, "")
-          .trim();
-
-        let analysis;
-
-        try {
-          analysis = JSON.parse(raw);
-        } catch {
-          lastMessage = "Gemini returned invalid JSON. Please retry.";
-          continue;
-        }
-
-        const requiredArrays = [
-          "strengths",
-          "missing_keywords",
-          "improvements",
-          "skill_gaps",
-          "learning_roadmap",
-          "interview_questions"
-        ];
-
-        const valid =
-          Number.isInteger(Number(analysis.ats_score)) &&
-          Number(analysis.ats_score) >= 0 &&
-          Number(analysis.ats_score) <= 100 &&
-          typeof analysis.summary === "string" &&
-          requiredArrays.every(field =>
-            Array.isArray(analysis[field])
-          );
-
-        if (!valid) {
-          lastMessage = "Gemini returned an incomplete report.";
-          continue;
-        }
-
-        return res.status(200).json({ analysis });
-
-      } catch (error) {
-        lastMessage =
-          error.name === "AbortError"
-            ? `Model ${model} timed out.`
-            : error.message || "Network error contacting Gemini.";
-      }
+      return res.status(status).json({
+        error: `Gemini analysis failed: ${message}`
+      });
     }
 
-    const overloaded =
-      /quota|resource exhausted|high demand|overloaded|unavailable|503|429/i
-        .test(lastMessage);
+    const raw = (data.candidates?.[0]?.content?.parts || [])
+      .map(part => part.text || "")
+      .join("")
+      .replace(/^```(?:json)?\s*/i, "")
+      .replace(/\s*```$/, "")
+      .trim();
 
-    return res.status(overloaded ? 503 : 502).json({
-      error: `CareerFit AI could not complete the analysis: ${lastMessage} Please try again shortly.`
-    });
+    let analysis;
+
+    try {
+      analysis = JSON.parse(raw);
+    } catch {
+      return res.status(502).json({
+        error: "Gemini returned an invalid report. Please try again."
+      });
+    }
+
+    const requiredArrays = [
+      "strengths",
+      "missing_keywords",
+      "improvements",
+      "skill_gaps",
+      "learning_roadmap",
+      "interview_questions"
+    ];
+
+    const valid =
+      Number.isInteger(Number(analysis.ats_score)) &&
+      Number(analysis.ats_score) >= 0 &&
+      Number(analysis.ats_score) <= 100 &&
+      typeof analysis.summary === "string" &&
+      requiredArrays.every(field =>
+        Array.isArray(analysis[field])
+      );
+
+    if (!valid) {
+      return res.status(502).json({
+        error: "Gemini returned an incomplete report. Please try again."
+      });
+    }
+
+    return res.status(200).json({ analysis });
 
   } catch (error) {
     return res.status(502).json({
       error:
         error.name === "AbortError"
-          ? "Gemini model lookup timed out."
+          ? "Gemini took too long to respond. Please try again."
           : error.message || "Unexpected server error."
     });
   }
