@@ -26,7 +26,7 @@ module.exports = async function handler(req, res) {
   try {
     const modelResponse = await timeoutFetch(
       `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}&pageSize=100`,
-      { method: "GET" }, 8000
+      { method: "GET" }, 5000
     );
     if (!modelResponse.ok) {
       const err = await modelResponse.json().catch(() => ({}));
@@ -50,7 +50,7 @@ module.exports = async function handler(req, res) {
       try {
         const response = await timeoutFetch(
           `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`,
-          { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }, 30000
+          { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }, 9000
         );
         const data = await response.json().catch(() => ({}));
         if (response.ok) {
